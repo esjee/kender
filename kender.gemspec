@@ -21,4 +21,5 @@ Gem::Specification.new do |s|
   s.add_dependency 'dice_bag', '>= 0.9', '< 2.0'
   s.add_development_dependency 'aruba', '~> 0.14'
   s.add_development_dependency 'rake', '~> 0'
+  s.add_development_dependency 'pry'
 end

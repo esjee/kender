@@ -11,11 +11,12 @@ def run_successfully?(tasks)
 end
 
 # This is the task we want the user to use all the time.
-desc "Configure and run continuous integration tests then clean up"
-task :ci => ['ci:status:pending'] do
+desc "Configure and run continuous integration tests then clean up. "\
+  "Can optionally be given a list of tasks to run, e.g. rake ci[rspec,cucumber] "
+task :ci => ['ci:status:pending'] do |_task, arguments|
   begin
     Rake::Task["ci:config"].invoke
-    Rake::Task["ci:run"].invoke
+    Rake::Task["ci:run"].invoke(*arguments.extras)
     Rake::Task["ci:status:success"].invoke
   rescue Exception => e
     Rake::Task["ci:status:failure"].invoke
@@ -32,10 +33,19 @@ namespace :ci do
   desc "Configure the app to run continuous integration tests."
   task :config => ['ci:env', 'ci:config_project', 'ci:setup_db']
 
-  desc "Run continuous integration tests with the current configuration"
-  task :run =>  ['ci:env'] do
+  desc "Run continuous integration tests with the current configuration. "\
+    "Can optionally be given a list of tasks to run, e.g. rake ci:run[rspec,cucumber] "
+  task :run =>  ['ci:env'] do |_task, arguments|
+    names_of_the_commands_to_run = arguments.extras.map(&:to_sym)
+
+    commands_to_run = if names_of_the_commands_to_run.any?
+                        Kender::Command.where name: names_of_the_commands_to_run
+                      else
+                        Kender::Command.all
+                      end
+
     #make sure we require all the tools we need loaded in memory
-    Kender::Command.all.each do |command|
+    commands_to_run.each do |command|
       command.execute
     end
   end

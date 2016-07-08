@@ -38,6 +38,10 @@ module Kender
         @all ||= commands.select(&:available?)
       end
 
+      def where(name:)
+        all.select { |command| command.name.in? name }
+      end
+
     end
 
     private
