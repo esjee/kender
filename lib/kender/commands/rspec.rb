@@ -9,9 +9,9 @@ module Kender
 
     def command
       if defined?(ParallelTests)
-        'bundle exec rake parallel:spec[^spec/integration]'
+        'bundle exec rake parallel:spec'
       else
-        'bundle exec rspec[^spec/integration]'
+        'bundle exec rspec'
       end
     end
 
